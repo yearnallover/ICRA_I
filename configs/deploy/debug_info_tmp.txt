@@ -1,0 +1,20 @@
+10Hz
+2026-01-26 10:54:36,268 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 0.0 Hz | Step Size: 0.0614 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:37,197 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 7.4 Hz | Step Size: 0.0797 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:38,200 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 9.1 Hz | Step Size: 0.4848 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:39,193 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 9.7 Hz | Step Size: 0.0607 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:40,199 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 9.9 Hz | Step Size: 0.5576 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:41,195 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.0882 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:42,198 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.1225 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:43,199 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.0286 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:44,200 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.3711 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:45,196 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.0394 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:46,197 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.3030 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:47,195 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.5691 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:48,201 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.3138 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+2026-01-26 10:54:49,201 - 🧠 MODEL | INFO: [DEBUG] Loop Freq: 10.0 Hz | Step Size: 0.2616 rad | /root/kuavo_data_challenge/kuavo_deploy/src/eval/sim_auto_test.py:261 
+
+
+20hz
+
+

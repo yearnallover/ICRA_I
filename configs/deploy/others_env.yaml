@@ -1,0 +1,20 @@
+hydra:  # Hydra config directory, for parameter checking only
+  run:
+    dir: ./outputs/other_env_task_eval_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
+  sweep:
+    dir: ./outputs/other_env_task_eval_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
+    subdir: ${hydra:job.override_dirname}
+
+
+# Config for all other environments, used for gym enviornment such as pusht, aloha, insert/cube, etc.
+use_delta: false  # Whether to use delta action. default=false (Not yet supported)
+eval_episodes: 100  # Number of evaluation episodes. 100 times default for simulator competition, for scoring purposes.
+seed: 42
+device: "cuda"  # or "cpu"
+task: "aloha_sim_transfer_cube_human"
+method: "your_method_name"
+timestamp: "run_20251017_095912"
+epoch: 300  # Which epoch to use from the training weights. I.e. 50, 100, best, etc. Note:Weights will be used from outputs/train/<task>/<method>/<timestamp>/epoch<epoch> to load policy
+max_episode_steps: 500  # Max episode steps. Stops after this threshold. Increase for longer tasks.
+env: aloha  # gym environment name. pusht or aloha
+

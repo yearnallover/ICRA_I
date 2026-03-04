@@ -1,0 +1,157 @@
+hydra: # Hydra config directory, for parameter checking only
+  run:
+    dir: ./outputs/train_hydra_save/singlerun/${now:%Y%m%d_%H%M%S}  # Single run root dir
+  sweep:
+    dir: ./outputs/train_hydra_save/multirun/${now:%Y%m%d_%H%M%S}  # sweep root dir
+    subdir: ${hydra:job.override_dirname}
+
+
+task: "TASK2"  # Custom task name. If using huggingface datasets instead of local dataset, please specify, such as pusht, aloha_sim_insertion_human etc.
+method: "original_act_setting"  # Custom method name
+timestamp: ${now:%Y%m%d_%H%M%S}  # Auto-obtained timestamp
+# The training parameters will be saved at outputs/train/<task>/<method>/<timestamp>
+repoid: "lerobot/${task}"  # Newer versions of lerobot require this, for lerobot reference only. Not actually used elsewhere.
+root: "/root/dataset/kuavo_lerobot_format/TASK2-ParcelWeighing-50/lerobot"  # Locally converted lerobot dataset directory
+# root: null  # If using huggingface datasets instead of local dataset, please specify in task, such as pusht, aloha_sim_insertion_human.
+# Uncomment and leave that to null in that case. This will then use their cloud downloads
+
+# Training Configurations
+training:
+    output_directory: "outputs/train/${task}/${method}"  # Training parameters default output path. Do not modify this structure
+    seed: 2025  # Data augmentation and training seed. Used for easier result reproduction
+    max_epoch: 200  # Max trainign epoch, used to control learning rate controller. Related to max_training_step beneath
+
+    save_freq_epoch: 10  # Training parameter save frequency. 10 epoch per saved weights
+    log_freq: 1  # Progress bar refresh frequency. 1 = Every iteration step.
+    device: "cuda" # Training device. Single GPU only by default. Systems with multiple GPU's please use CUDA_VISIBLE_DEVICES=6 as an envionment variable. cuda:6 might not work.
+    accumulation_steps: 1  # Grad accumulation step
+    ema_power: 0.75  # This parameter can be used if the EMA (Equation of Mobility) moving exponential average method is employed.
+    # However, current testing shows that using EMA causes performance degradation, so it is no longer supported in the code.
+
+    batch_size: 16  # Batch size. Adjust as needed.
+    num_workers: 0  # dataloader's num_workers. Adjust as needed per your computer's performance. Setting it too high might lock up your computer
+    drop_last: False  # Whether to drop the last incomplete batch
+
+    # Max training step. Used to control the learning rate adjuster. If `max_training_step` is specified, it will take precedence
+    # otherwise, this value will be automatically determined based on `max_epoch` mentioned above. ONLY one of the two will take effect!
+    max_training_step: null
+
+    # resume training
+    resume: false
+    resume_timestamp: "run_20251118_144927"  # If enabled, it will pull the last epoch from outputs/train/<task>/<method>/<resume_timestamp> to continue training
+
+    scheduler_name: cosine  # The learning rate tuner name. Takes effect only if the scheduler is not included in the policy config
+    # Otherwise, the policy's built-in tuner will be used. Related parameters will also be listed in the policy section below.
+    scheduler_warmup_steps: 500  # Learning rate warm up steps
+
+
+    # Data augmentation related config
+    RGB_Augmenter:
+      enable: True
+      max_num_transforms: 1
+      random_order: True
+      tfs:
+        notransform:
+          weight: 3.0  # Weight
+          type: "Identity"
+          kwargs: {}
+        brightness:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"brightness": [0.5, 1.5]}
+        contrast:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"contrast": [0.5, 1.5]}
+        saturation:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"saturation": [0.5, 1.5]}
+        hue:
+          weight: 1.0
+          type: "ColorJitter"
+          kwargs: {"hue": [-0.05, 0.05]}
+        sharpness:
+          weight: 1.0
+          type: "SharpnessJitter"
+          kwargs: {"sharpness": [0.5, 1.5]}
+        random_mask:
+          weight: 1.0
+          type: RandomMask
+          kwargs:
+            mask_size: [0.1, 0.1]   # h_ratio, w_ratio
+        random_border_cutout:
+          weight: 1.0
+          type: RandomBorderCutout
+          kwargs:
+            cut_ratio: 0.15
+        gaussian_noise:
+          weight: 1.0
+          type: GaussianNoise
+          kwargs:
+            mean: 0.0
+            std: 0.05
+        gamma_correction:
+          weight: 1.0
+          type: GammaCorrection
+          kwargs:
+            gamma: [0.5, 2.0]
+
+policy_name: act  # Policy type. Supports diffusion and act
+
+# Policy-related Configs
+policy:
+    _target_: kuavo_train.wrapper.policy.act.ACTConfigWrapper.CustomACTConfigWrapper  # Used for instantiation
+    n_obs_steps: 1  # Observation steps
+    chunk_size: 100  # Chunk size
+    n_action_steps: 1  # Chunk steps
+
+    normalization_mapping: # RGB is equivalent to VISUAL type. diffusion also supports depth data. These two parameters are used to set the normalization method.
+      RGB: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MEAN_STD
+      DEPTH: 
+        _target_: lerobot.configs.types.NormalizationMode
+        value: MIN_MAX
+
+    use_amp: True  # Mixed precision training
+
+    # Model hyperparameters adjustments
+    vision_backbone: resnet18
+    pretrained_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
+    replace_final_stride_with_dilation: False
+    # Transformer layers.
+    pre_norm: False
+    dim_model: 512
+    n_heads: 8
+    dim_feedforward: 3200
+    feedforward_activation: relu
+    n_encoder_layers: 4
+    # Note: Although the original ACT implementation has 7 for `n_decoder_layers`, there is a bug in the code
+    # that means only the first layer is used. Here we match the original implementation by setting this to 1.
+    # See this issue https://github.com/tonyzhaozh/act/issues/25#issue-2258740521.
+    n_decoder_layers: 1
+    # VAE.
+    use_vae: True
+    latent_dim: 64
+    n_vae_encoder_layers: 4
+
+    # Inference.
+    # Note: the value used in ACT when temporal ensembling is enabled is 0.01.
+    temporal_ensemble_coeff: -0.1
+
+    # Training and loss computation.
+    dropout: 0.1
+    kl_weight: 10.0
+
+    # Training preset
+    optimizer_lr: 1e-5
+    optimizer_weight_decay: 1e-4
+    optimizer_lr_backbone: 1e-5
+
+    custom:  # Custom configs. Special adjustments based on the lerobot ACT policy, including depth support. You may refer to related codes for details
+      # support depth image
+      use_depth: true
+      depth_backbone: resnet18
+      pretrained_depth_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
+
